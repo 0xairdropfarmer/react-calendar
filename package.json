@@ -1,10 +1,11 @@
 {
-  "name": "new",
+  "name": "react-calendar",
   "version": "1.0.0",
-  "description": "",
+  "description": "create simple calendar compent on react",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "moment": "2.22.2",
     "react": "16.5.2",
     "react-dom": "16.5.2",
     "react-scripts": "2.0.3"
