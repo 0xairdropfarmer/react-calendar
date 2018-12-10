@@ -4,11 +4,7 @@ import ReactDOM from "react-dom";
 import Calendar from "./components/calendar";
 
 function App() {
-  return (
-    <div className="App">
-      <Calendar />
-    </div>
-  );
+  return <Calendar />;
 }
 
 const rootElement = document.getElementById("root");
