@@ -9,6 +9,9 @@ export default class Calendar extends React.Component {
   daysInMonth = () => {
     return this.state.dateObject.daysInMonth();
   };
+  currentDay = () => {
+    return this.state.dateObject.format("D");
+  };
   firstDayOfMonth = () => {
     let dateObject = this.state.dateObject;
     let firstDay = moment(dateObject)
@@ -23,18 +26,14 @@ export default class Calendar extends React.Component {
     });
     let blanks = [];
     for (let i = 0; i < this.firstDayOfMonth(); i++) {
-      blanks.push(
-        <td key={i * 80} className="calendar-day empty">
-          {""}
-        </td>
-      );
+      blanks.push(<td className="calendar-day empty">{""}</td>);
     }
     let daysInMonth = [];
     for (let d = 1; d <= this.daysInMonth(); d++) {
-      // let className = (d == this.currentDay() ? "day current-day": "day");
+      let currentDay = d == this.currentDay() ? "today" : "";
       // let selectedClass = (d == this.state.selectedDay ? " selected-day " : "")
       daysInMonth.push(
-        <td key={d} className="calendar-day">
+        <td key={d} className={`calendar-day ${currentDay}`}>
           {d}
         </td>
       );
@@ -59,7 +58,7 @@ export default class Calendar extends React.Component {
     });
 
     let daysinmonth = rows.map((d, i) => {
-      return <tr key={i * 100}>{d}</tr>;
+      return <tr>{d}</tr>;
     });
     return (
       <div className="tail-datetime-calendar">
