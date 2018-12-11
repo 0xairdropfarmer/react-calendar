@@ -3,12 +3,15 @@ import moment from "moment";
 import "./calendar.css";
 export default class Calendar extends React.Component {
   weekdayshort = moment.weekdaysShort();
+  months = moment.months();
   state = {
+    showMonthPopup: false,
     dateObject: moment()
   };
   daysInMonth = () => {
     return this.state.dateObject.daysInMonth();
   };
+
   currentDay = () => {
     return this.state.dateObject.format("D");
   };
@@ -18,6 +21,70 @@ export default class Calendar extends React.Component {
       .startOf("month")
       .format("d"); // Day of week 0...1..5...6
     return firstDay;
+  };
+  month = () => {
+    return this.state.dateObject.format("MMMM");
+  };
+  onChangeMonth = (e, month) => {
+    this.setState({
+      showMonthPopup: !this.state.showMonthPopup
+    });
+  };
+  onSelectChange = (e, data) => {
+    this.setMonth(data);
+    this.onChangeMonth();
+  };
+  setMonth = month => {
+    let monthNo = this.months.indexOf(month);
+    let dateObject = Object.assign({}, this.state.dateObject);
+    dateObject = moment(dateObject).set("month", monthNo);
+    this.setState({
+      dateObject: dateObject
+    });
+  };
+  SelectList = props => {
+    let months = [];
+    props.data.map(data => {
+      months.push(
+        <td
+          key={data}
+          className="calendar-month"
+          onClick={e => {
+            this.onSelectChange(e, data);
+          }}
+        >
+          <span>{data}</span>
+        </td>
+      );
+    });
+    let rows = [];
+    let cells = [];
+
+    months.forEach((row, i) => {
+      if (i % 3 !== 0 || i == 0) {
+        cells.push(row);
+      } else {
+        let insertRow = cells.slice();
+        rows.push(insertRow);
+        cells = [];
+        cells.push(row);
+      }
+    });
+    rows.push(cells);
+    let monthlist = rows.map((d, i) => {
+      return <tr>{d}</tr>;
+    });
+
+    return (
+      <table className="calendar-month">
+        <thead>
+          <tr>
+            <th colSpan="4">Select a Month</th>
+          </tr>
+        </thead>
+        <tbody>{monthlist}</tbody>
+      </table>
+    );
   };
 
   render() {
@@ -60,8 +127,23 @@ export default class Calendar extends React.Component {
     let daysinmonth = rows.map((d, i) => {
       return <tr>{d}</tr>;
     });
+
     return (
       <div className="tail-datetime-calendar">
+        <div
+          className="calendar-navi"
+          onClick={e => {
+            this.onChangeMonth(e, this.month());
+          }}
+        >
+          <span data-tail-navi="switch" class="calendar-label">
+            {" "}
+            {this.month()}
+          </span>
+        </div>
+        <div className="calendar-date">
+          {this.state.showMonthPopup && <this.SelectList data={this.months} />}
+        </div>
         <div className="calendar-date">
           <table className="calendar-day">
             <thead>
