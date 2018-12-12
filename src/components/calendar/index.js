@@ -10,7 +10,8 @@ export default class Calendar extends React.Component {
     showMonthTable: false,
     dateObject: moment(),
     allmonths: moment.months(),
-    showYearNav: false
+    showYearNav: false,
+    selectedDay: null
   };
   daysInMonth = () => {
     return this.state.dateObject.daysInMonth();
@@ -98,13 +99,25 @@ export default class Calendar extends React.Component {
   };
 
   onPrev = () => {
+    let curr = "";
+    if (this.state.showMonthTable == true) {
+      curr = "year";
+    } else {
+      curr = "month";
+    }
     this.setState({
-      dateObject: this.state.dateObject.subtract(1, "month")
+      dateObject: this.state.dateObject.subtract(1, curr)
     });
   };
   onNext = () => {
+    let curr = "";
+    if (this.state.showMonthTable == true) {
+      curr = "year";
+    } else {
+      curr = "month";
+    }
     this.setState({
-      dateObject: this.state.dateObject.add(1, "month")
+      dateObject: this.state.dateObject.add(1, curr)
     });
   };
   setYear = year => {
@@ -120,15 +133,6 @@ export default class Calendar extends React.Component {
   };
   onYearChange = e => {
     this.setYear(e.target.value);
-    this.props.onYearChange && this.props.onYearChange(e, e.target.value);
-  };
-  onKeyUpYear = e => {
-    if (e.which === 13 || e.which === 27) {
-      this.setYear(e.target.value);
-      this.setState({
-        showYearNav: false
-      });
-    }
   };
   getDates(startDate, stopDate) {
     var dateArray = [];
@@ -190,7 +194,16 @@ export default class Calendar extends React.Component {
       </table>
     );
   };
-
+  onDayClick = (e, d) => {
+    this.setState(
+      {
+        selectedDay: d
+      },
+      () => {
+        console.log("SELECTED DAY: ", this.state.selectedDay);
+      }
+    );
+  };
   render() {
     let weekdayshortname = this.weekdayshort.map(day => {
       return <th key={day}>{day}</th>;
@@ -205,7 +218,13 @@ export default class Calendar extends React.Component {
       // let selectedClass = (d == this.state.selectedDay ? " selected-day " : "")
       daysInMonth.push(
         <td key={d} className={`calendar-day ${currentDay}`}>
-          {d}
+          <span
+            onClick={e => {
+              this.onDayClick(e, d);
+            }}
+          >
+            {d}
+          </span>
         </td>
       );
     }
@@ -240,7 +259,7 @@ export default class Calendar extends React.Component {
             }}
             class="calendar-button button-prev"
           />
-          {!this.state.showMonthTable && (
+          {!this.state.showMonthTable && !this.state.showYearEditor && (
             <span
               onClick={e => {
                 this.showMonth();
@@ -263,7 +282,7 @@ export default class Calendar extends React.Component {
             onClick={e => {
               this.onNext();
             }}
-            class="calendar-button button-next"
+            className="calendar-button button-next"
           />
         </div>
         <div className="calendar-date">
