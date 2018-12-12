@@ -1,10 +1,12 @@
 import React from "react";
 import moment from "moment";
+import { range } from "moment-range";
 import "./calendar.css";
 export default class Calendar extends React.Component {
   weekdayshort = moment.weekdaysShort();
 
   state = {
+    showCalendarTable: true,
     showMonthTable: false,
     dateObject: moment(),
     allmonths: moment.months(),
@@ -31,7 +33,8 @@ export default class Calendar extends React.Component {
   };
   showMonth = (e, month) => {
     this.setState({
-      showMonthTable: !this.state.showMonthTable
+      showMonthTable: !this.state.showMonthTable,
+      showCalendarTable: !this.state.showCalendarTable
     });
   };
   setMonth = month => {
@@ -40,7 +43,8 @@ export default class Calendar extends React.Component {
     dateObject = moment(dateObject).set("month", monthNo);
     this.setState({
       dateObject: dateObject,
-      showMonthTable: !this.state.showMonthTable
+      showMonthTable: !this.state.showMonthTable,
+      showCalendarTable: !this.state.showCalendarTable
     });
   };
   MonthList = props => {
@@ -83,6 +87,106 @@ export default class Calendar extends React.Component {
           </tr>
         </thead>
         <tbody>{monthlist}</tbody>
+      </table>
+    );
+  };
+  showYearEditor = () => {
+    this.setState({
+      showYearNav: true,
+      showCalendarTable: !this.state.showCalendarTable
+    });
+  };
+
+  onPrev = () => {
+    this.setState({
+      dateObject: this.state.dateObject.subtract(1, "month")
+    });
+  };
+  onNext = () => {
+    this.setState({
+      dateObject: this.state.dateObject.add(1, "month")
+    });
+  };
+  setYear = year => {
+    // alert(year)
+    let dateObject = Object.assign({}, this.state.dateObject);
+    dateObject = moment(dateObject).set("year", year);
+    this.setState({
+      dateObject: dateObject,
+      showMonthTable: !this.state.showMonthTable,
+      showYearNav: !this.state.showYearNav,
+      showMonthTable: !this.state.showMonthTable
+    });
+  };
+  onYearChange = e => {
+    this.setYear(e.target.value);
+    this.props.onYearChange && this.props.onYearChange(e, e.target.value);
+  };
+  onKeyUpYear = e => {
+    if (e.which === 13 || e.which === 27) {
+      this.setYear(e.target.value);
+      this.setState({
+        showYearNav: false
+      });
+    }
+  };
+  getDates(startDate, stopDate) {
+    var dateArray = [];
+    var currentDate = moment(startDate);
+    var stopDate = moment(stopDate);
+    while (currentDate <= stopDate) {
+      dateArray.push(moment(currentDate).format("YYYY"));
+      currentDate = moment(currentDate).add(1, "year");
+    }
+    return dateArray;
+  }
+  YearTable = props => {
+    let months = [];
+    let nextten = moment()
+      .set("year", props)
+      .add("year", 12)
+      .format("Y");
+
+    let tenyear = this.getDates(props, nextten);
+
+    tenyear.map(data => {
+      months.push(
+        <td
+          key={data}
+          className="calendar-month"
+          onClick={e => {
+            this.setYear(data);
+          }}
+        >
+          <span>{data}</span>
+        </td>
+      );
+    });
+    let rows = [];
+    let cells = [];
+
+    months.forEach((row, i) => {
+      if (i % 3 !== 0 || i == 0) {
+        cells.push(row);
+      } else {
+        rows.push(cells);
+        cells = [];
+        cells.push(row);
+      }
+    });
+    rows.push(cells);
+    let yearlist = rows.map((d, i) => {
+      return <tr>{d}</tr>;
+    });
+
+    return (
+      <table className="calendar-month">
+        <thead>
+          <tr>
+            <th colSpan="4">Select a Yeah</th>
+          </tr>
+        </thead>
+        <tbody>{yearlist}</tbody>
       </table>
     );
   };
@@ -129,23 +233,47 @@ export default class Calendar extends React.Component {
 
     return (
       <div className="tail-datetime-calendar">
-        <div
-          className="calendar-navi"
-          onClick={e => {
-            this.showMonth();
-          }}
-        >
-          <span data-tail-navi="switch" class="calendar-label">
-            {this.month()}{" "}
+        <div className="calendar-navi">
+          <span
+            onClick={e => {
+              this.onPrev();
+            }}
+            class="calendar-button button-prev"
+          />
+          {!this.state.showMonthTable && (
+            <span
+              onClick={e => {
+                this.showMonth();
+              }}
+              class="calendar-label"
+            >
+              {this.month()},
+            </span>
+          )}
+          <span
+            className="calendar-label"
+            onClick={e => {
+              this.showYearEditor();
+            }}
+          >
+            {this.year()}
           </span>
+
+          <span
+            onClick={e => {
+              this.onNext();
+            }}
+            class="calendar-button button-next"
+          />
         </div>
         <div className="calendar-date">
+          {this.state.showYearNav && <this.YearTable props={this.year()} />}
           {this.state.showMonthTable && (
             <this.MonthList data={moment.months()} />
           )}
         </div>
 
-        {!this.state.showMonthTable && (
+        {this.state.showCalendarTable && (
           <div className="calendar-date">
             <table className="calendar-day">
               <thead>
