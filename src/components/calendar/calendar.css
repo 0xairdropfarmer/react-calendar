@@ -152,12 +152,7 @@
 .tail-datetime-calendar .calendar-date table tbody tr > td.calendar-day:hover {
   color: #cd283c;
 }
-.tail-datetime-calendar
-  .calendar-date
-  table
-  tbody
-  tr
-  > td.calendar-day:hover:after {
+.tail-datetime-calendar .calendar-date table tbody tr > td.calendar-day:hover:after {
   border-color: #cd283c;
 }
 .tail-datetime-calendar .calendar-date table tbody tr > *.empty,
